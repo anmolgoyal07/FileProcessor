@@ -9,12 +9,12 @@ import org.springframework.context.annotation.ComponentScan;
 import me.anmolgoyal.fileprocessor.service.DirectoryProcessService;
 
 @SpringBootApplication
-@ComponentScan(basePackages ="me.anmolgoyal.fileprocessor")
+@ComponentScan(basePackages = "me.anmolgoyal.fileprocessor")
 public class FileProcessorApplication implements CommandLineRunner {
 
 	@Autowired
 	private DirectoryProcessService directoryProcessService;
-	
+
 	public static void main(String[] args) {
 		SpringApplication.run(FileProcessorApplication.class, args);
 	}
@@ -22,9 +22,7 @@ public class FileProcessorApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		directoryProcessService.processRootDir("E:\\file_visit");
-		
+
 	}
-	
-	
 
 }
