@@ -8,10 +8,10 @@
 		<version>2.1.3.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.sapient</groupId>
-	<artifactId>FileProcessor</artifactId>
+	<groupId>me.anmolgoyal</groupId>
+	<artifactId>file-processor</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>FileProcessor</name>
+	<name>file-processor</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
