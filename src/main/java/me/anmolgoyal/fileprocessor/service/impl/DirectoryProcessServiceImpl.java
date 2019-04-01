@@ -52,7 +52,10 @@ public class DirectoryProcessServiceImpl implements DirectoryProcessService {
 			vowelCount += fileInfo.getVowelCount();
 			specialCharCount += fileInfo.getSpecialCharCount();
 		}
-
+		fileInfo = new FileInfo(wordsCount, vowelCount, specialCharCount);
+		String fileName = dir.resolve(dir.getFileName()).toString() + ".dmtd";
+		fileInfo.setFileName(Paths.get(fileName));
+		dmtdFileWriter.writeFile(fileInfo);
 	}
 
 	/**

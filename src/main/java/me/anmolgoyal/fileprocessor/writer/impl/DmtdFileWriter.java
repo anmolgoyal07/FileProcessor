@@ -24,7 +24,6 @@ public class DmtdFileWriter implements FileWriter {
 		if(file.exists()) {
 			file.delete();
 		}
-		fileName = fileName.substring(0, fileName.lastIndexOf('.')+1)+"mtd";
 		try (BufferedWriter writer = Files.newBufferedWriter(fileInfo.getFileName())) {
 			writer.write(content);
 		} catch (IOException e) {
