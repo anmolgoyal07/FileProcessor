@@ -38,7 +38,7 @@ public class DirectoryProcessServiceImpl implements DirectoryProcessService {
 	private FileReader textReader;
 
 	@Autowired
-	FileWatcherService fileWatcherService;
+	private FileWatcherService fileWatcherService;
 	/**
 	 * To list out all the directory and invoke further logic 
 	 */
@@ -53,6 +53,7 @@ public class DirectoryProcessServiceImpl implements DirectoryProcessService {
 	 */
 	public void processDirectory(Path dir) {
 		//fetching all files in a dir
+		System.out.println("Starting processing dir: "+dir);
 		List<Path> allFiles = getAllFilesInDir(dir);
 		int wordsCount = 0, vowelCount = 0, specialCharCount = 0;
 		FileInfo fileInfo;
@@ -74,6 +75,7 @@ public class DirectoryProcessServiceImpl implements DirectoryProcessService {
 
 		//registering watcher on a dir path
 		fileWatcherService.registerDir(dir);
+		System.out.println("Processing finish for dir: "+dir+"\n");
 	}
 
 	/**

@@ -40,10 +40,10 @@ public class FileProcessServiceImpl implements FileProcessService {
 	public FileInfo processFile(Path filepath) {
 		
 		if(cache.get(filepath.toString()) != null) {
-			System.out.println("File already processed : "+filepath);
+			System.out.println("  File already processed : "+filepath);
 			return null;
 		}
-		
+		System.out.println("  Starting processing file : "+filepath);
 		List<String> fileContent;
 		FileInfo fileInfo = null;
 		if (filepath.endsWith("txt")) {
@@ -64,7 +64,7 @@ public class FileProcessServiceImpl implements FileProcessService {
 		
 		//making entry in cache
 		cache.put(filepath.toString(), filepath.toFile().lastModified());
-		
+		System.out.println("  File processed successfully : "+filepath);
 		return fileInfo;
 
 	}

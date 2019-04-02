@@ -76,7 +76,7 @@ public class FileWatcherServiceImpl implements FileWatcherService {
 					if (Files.isRegularFile(child)
 							&& (child.toString().endsWith("txt") || child.toString().endsWith("csv"))) {
 						// print out event
-						System.out.format("%s: %s\n", event.kind().name(), child);
+						System.out.format("Got the new file for processing %s \n", child);
 						directoryProcessService.processNewFileInDir(dir, child);
 					}
 				}
