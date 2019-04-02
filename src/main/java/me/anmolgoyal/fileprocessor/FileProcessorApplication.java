@@ -14,7 +14,7 @@ public class FileProcessorApplication implements CommandLineRunner {
 
 	@Autowired
 	private DirectoryProcessService directoryProcessService;
-
+	
 	public static void main(String[] args) {
 		SpringApplication.run(FileProcessorApplication.class, args);
 	}

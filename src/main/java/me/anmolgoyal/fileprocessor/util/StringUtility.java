@@ -4,7 +4,7 @@ import me.anmolgoyal.fileprocessor.model.FileInfo;
 
 public class StringUtility {
 
-	public FileInfo decode(String str) {
+	public static FileInfo decode(String str) {
 		FileInfo fileInfo = null;
 		int wordsCount = 0, vowelCount = 0, specialCharCount = 0;
 		String[] strArr = str.split(" ");

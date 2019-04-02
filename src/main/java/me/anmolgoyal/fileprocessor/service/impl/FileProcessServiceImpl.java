@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.Cache;
 import org.springframework.stereotype.Service;
 
 import me.anmolgoyal.fileprocessor.model.FileInfo;
@@ -29,11 +30,20 @@ public class FileProcessServiceImpl implements FileProcessService {
 	@Autowired
 	@Qualifier("mtdFileWriter")
 	FileWriter mtdFileWriter;
+	
+	@Autowired
+	private Cache cache;
 
 	@Autowired
 	private WordProcessingService wordProcessingService;
 
 	public FileInfo processFile(Path filepath) {
+		
+		if(cache.get(filepath.toString()) != null) {
+			System.out.println("File already processed : "+filepath);
+			return null;
+		}
+		
 		List<String> fileContent;
 		FileInfo fileInfo = null;
 		if (filepath.endsWith("txt")) {
@@ -47,10 +57,14 @@ public class FileProcessServiceImpl implements FileProcessService {
 		}
 
 		fileInfo = wordProcessingService.processFileContent(fileContent);
-		String fileName = filepath.toString();
-		fileName = fileName.substring(0, fileName.lastIndexOf('.') + 1) + "mtd";
-		fileInfo.setFileName(Paths.get(fileName));
+		String mtdFileName = filepath.toString();
+		mtdFileName = mtdFileName.substring(0, mtdFileName.lastIndexOf('.') + 1) + "mtd";
+		fileInfo.setFileName(Paths.get(mtdFileName));
 		mtdFileWriter.writeFile(fileInfo);
+		
+		//making entry in cache
+		cache.put(filepath.toString(), filepath.toFile().lastModified());
+		
 		return fileInfo;
 
 	}

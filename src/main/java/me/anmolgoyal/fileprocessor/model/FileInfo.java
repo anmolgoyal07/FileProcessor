@@ -9,6 +9,13 @@ public class FileInfo {
 	private int vowelCount;
 	private int specialCharCount;
 	
+	public FileInfo() {
+		super();
+		this.wordsCount = 0;
+		this.vowelCount = 0;
+		this.specialCharCount = 0;
+	}
+	
 	public FileInfo(int wordsCount, int vowelCount, int specialCharCount) {
 		super();
 		this.wordsCount = wordsCount;
