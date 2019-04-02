@@ -26,7 +26,7 @@ import me.anmolgoyal.fileprocessor.listener.FileRemovalListener;
 
 @Configuration
 @EnableCaching
-public class CacheConfig implements CachingConfigurer {
+public class CacheConfig  implements CachingConfigurer {
 
     public final static String CACHE_ONE = "cacheOne";
 
@@ -45,7 +45,8 @@ public class CacheConfig implements CachingConfigurer {
         log.info("Initializing simple Guava Cache manager.");
         SimpleCacheManager cacheManager = new SimpleCacheManager();
 
-        GuavaCache cache1 = new GuavaCache(CACHE_ONE, CacheBuilder.newBuilder()
+        @SuppressWarnings("unchecked")
+		GuavaCache cache1 = new GuavaCache(CACHE_ONE, CacheBuilder.newBuilder()
                 .expireAfterWrite(ttlTime, TimeUnit.SECONDS).removalListener(fileRemovalListener)
                 .build());
 

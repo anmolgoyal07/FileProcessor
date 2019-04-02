@@ -20,7 +20,6 @@ import me.anmolgoyal.fileprocessor.reader.FileReader;
 import me.anmolgoyal.fileprocessor.service.DirectoryProcessService;
 import me.anmolgoyal.fileprocessor.service.FileProcessService;
 import me.anmolgoyal.fileprocessor.service.FileWatcherService;
-import me.anmolgoyal.fileprocessor.util.StringUtility;
 import me.anmolgoyal.fileprocessor.writer.FileWriter;
 
 @Service
@@ -45,6 +44,7 @@ public class DirectoryProcessServiceImpl implements DirectoryProcessService {
 	public void processRootDir(String dirPath) {
 		List<Path> allDirectories = getAllDirectoryPath(Paths.get(dirPath));
 		allDirectories.forEach(dirName -> processDirectory(dirName));
+		
 		fileWatcherService.processEvents();
 	}
 	
@@ -85,19 +85,19 @@ public class DirectoryProcessServiceImpl implements DirectoryProcessService {
 	 */
 	public void processNewFileInDir(Path dir, Path file) {
 		FileInfo fileInfo = fileProcessingService.processFile(file);
-		
 		String fileName = dir.resolve(dir.getFileName()).toString() + ".dmtd";
-		List<String> fileContent = textReader.readFile(Paths.get(fileName));
-		FileInfo dirFileInfo =  new FileInfo();
-		if(!fileContent.isEmpty()) {
-			dirFileInfo = StringUtility.decode(fileContent.get(0));
-		}
+		
+		FileInfo dirFileInfo =  fileProcessingService.decodeDmtdOrMtdFile(Paths.get(fileName));
+		
 		dirFileInfo.setSpecialCharCount(dirFileInfo.getSpecialCharCount() + fileInfo.getSpecialCharCount());
 		dirFileInfo.setVowelCount(dirFileInfo.getVowelCount() + fileInfo.getVowelCount());
 		dirFileInfo.setWordsCount(dirFileInfo.getWordsCount() + fileInfo.getWordsCount());
 		dirFileInfo.setFileName(Paths.get(fileName) );
+		
 		dmtdFileWriter.writeFile(dirFileInfo);
 	}
+	
+	
 
 
 	/**

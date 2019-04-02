@@ -11,4 +11,8 @@ public interface FileProcessService {
 	 */
 	public FileInfo processFile(Path filepath);
 	
+	public boolean verifyFileAfterRemove(Path filePath,long timeStamp);
+	
+	public FileInfo decodeDmtdOrMtdFile(Path dmtdPath);
+	
 }
