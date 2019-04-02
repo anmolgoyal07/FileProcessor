@@ -13,4 +13,11 @@ public interface DirectoryProcessService {
 	 * process all files in current directory
 	 */
 	public void processDirectory(Path dir);
+	
+	/**
+	 * Process new file a dir
+	 * @param dir
+	 * @param file
+	 */
+	public void processNewFileInDir(Path dir, Path file);
 }

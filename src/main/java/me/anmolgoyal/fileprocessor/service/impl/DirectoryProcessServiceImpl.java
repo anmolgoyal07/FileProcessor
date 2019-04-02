@@ -1,21 +1,14 @@
 package me.anmolgoyal.fileprocessor.service.impl;
 
-import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
-
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -26,6 +19,7 @@ import me.anmolgoyal.fileprocessor.model.FileInfo;
 import me.anmolgoyal.fileprocessor.reader.FileReader;
 import me.anmolgoyal.fileprocessor.service.DirectoryProcessService;
 import me.anmolgoyal.fileprocessor.service.FileProcessService;
+import me.anmolgoyal.fileprocessor.service.FileWatcherService;
 import me.anmolgoyal.fileprocessor.util.StringUtility;
 import me.anmolgoyal.fileprocessor.writer.FileWriter;
 
@@ -40,21 +34,18 @@ public class DirectoryProcessServiceImpl implements DirectoryProcessService {
 	private FileWriter dmtdFileWriter;
 
 	@Autowired
-	private WatchService watcher;
-	
-	@Autowired
 	@Qualifier("txtFileReader")
 	private FileReader textReader;
 
-	private final Map<WatchKey, Path> watcherKeys = new HashMap<WatchKey, Path>();;
-
+	@Autowired
+	FileWatcherService fileWatcherService;
 	/**
 	 * To list out all the directory and invoke further logic 
 	 */
 	public void processRootDir(String dirPath) {
 		List<Path> allDirectories = getAllDirectoryPath(Paths.get(dirPath));
 		allDirectories.forEach(dirName -> processDirectory(dirName));
-		processEvents();
+		fileWatcherService.processEvents();
 	}
 	
 	/**
@@ -82,13 +73,7 @@ public class DirectoryProcessServiceImpl implements DirectoryProcessService {
 		dmtdFileWriter.writeFile(fileInfo);
 
 		//registering watcher on a dir path
-		WatchKey key;
-		try {
-			key = dir.register(watcher, ENTRY_CREATE);
-		} catch (IOException e) {
-			throw new SystemException("Unable to register watcher on dir:: "+dir, e);
-		}
-		watcherKeys.put(key, dir);
+		fileWatcherService.registerDir(dir);
 	}
 
 	/**
@@ -96,7 +81,7 @@ public class DirectoryProcessServiceImpl implements DirectoryProcessService {
 	 * @param dir
 	 * @param file
 	 */
-	private void processNewFileInDir(Path dir, Path file) {
+	public void processNewFileInDir(Path dir, Path file) {
 		FileInfo fileInfo = fileProcessingService.processFile(file);
 		
 		String fileName = dir.resolve(dir.getFileName()).toString() + ".dmtd";
@@ -113,61 +98,8 @@ public class DirectoryProcessServiceImpl implements DirectoryProcessService {
 	}
 
 
-	/*
-	 * Process event if new file is created
-	 */
-	private void processEvents() {
-		while (true) {
-			// wait for key to be signalled
-			WatchKey key;
-			try {
-				//blocking action
-				key = watcher.take();
-			} catch (InterruptedException ex) {
-				throw new SystemException("Got interupted while getiing event from watcher", ex);
-			}
-
-			Path dir = watcherKeys.get(key);
-			if (dir == null) {
-				System.err.println("WatchKey not recognized!!");
-				continue;
-			}
-
-			for (WatchEvent<?> event : key.pollEvents()) {
-				@SuppressWarnings("rawtypes")
-				WatchEvent.Kind kind = event.kind();
-
-				// Context for directory entry event is the file name of entry
-				@SuppressWarnings("unchecked")
-				Path name = ((WatchEvent<Path>)event).context();
-				Path child = dir.resolve(name);
-
-				// if directory is created, and watching recursively, then register it and its sub-directories
-				if (kind == ENTRY_CREATE) {
-					if (Files.isRegularFile(child) &&( child.toString().endsWith("txt") || child.toString().endsWith("csv") ) ) {
-						// print out event
-						System.out.format("%s: %s\n", event.kind().name(), child);
-						processNewFileInDir(dir, child);
-					}
-				}
-			}
-
-			// reset key and remove from set if directory no longer accessible
-			boolean valid = key.reset();
-			if (!valid) {
-				watcherKeys.remove(key);
-
-				// all directories are inaccessible
-				if (watcherKeys.isEmpty()) {
-					break;
-				}
-			}
-		}
-	}
-
 	/**
-	 * Get All Files name of a dir
-	 * 
+	 * To get All Files name of a dir
 	 * @param dir
 	 * @return
 	 */
@@ -184,8 +116,10 @@ public class DirectoryProcessServiceImpl implements DirectoryProcessService {
 		return fileNames;
 	}
 
-	/*
-	 * Get All Directory Names
+	/**
+	 * 
+	 * @param path
+	 * @return
 	 */
 	private List<Path> getAllDirectoryPath(Path path) {
 

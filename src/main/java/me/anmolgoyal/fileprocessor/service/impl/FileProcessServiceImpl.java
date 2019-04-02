@@ -25,7 +25,7 @@ public class FileProcessServiceImpl implements FileProcessService {
 
 	@Autowired
 	@Qualifier("csvFileReader")
-	private CSVFileReader csvReader;
+	private FileReader csvReader;
 
 	@Autowired
 	@Qualifier("mtdFileWriter")
